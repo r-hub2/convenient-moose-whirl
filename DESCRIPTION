@@ -29,7 +29,7 @@ RoxygenNote: 7.3.2
 SystemRequirements: Quarto command line tool
         (<https://github.com/quarto-dev/quarto-cli>).
 NeedsCompilation: no
-Packaged: 2025-03-12 13:22:48 UTC; oath
+Packaged: 2025-03-12 14:23:39 UTC; oath
 Author: Aksel Thomsen [aut, cre],
   Lovemore Gakava [aut],
   Cervan Girard [aut],
