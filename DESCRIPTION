@@ -1,0 +1,40 @@
+Package: whirl
+Title: Logging package
+Version: 0.1.10.9002
+Authors@R: c(
+    person("Aksel", "Thomsen", , "oath@novonordisk.com", role = c("aut", "cre")),
+    person("Lovemore", "Gakava", , "lvgk@novonordisk.com", role = "aut"),
+    person("Cervan", "Girard", , "cgid@novonordisk.com", role = "aut"),
+    person("Kristian", "Troejelsgaard", , "ktqn@novonordisk.com", role = "aut"),
+    person("Steffen Falgreen", "Larsen", , "sffl@novonordisk.com", role = "aut"),
+    person("Vladimir", "Obucina", , "vlob@novonordisk.com", role = "aut"),
+    person("Novo Nordisk A/S", role = "cph")
+  )
+Description: Provides functionalities for running R scripts in batch,
+    while simultaneously creating logs for each script execution.
+License: Apache License (>= 2)
+URL: https://novonordisk-opensource.github.io/whirl/,
+        https://github.com/novonordisk-opensource/whirl
+Depends: R (>= 4.1)
+Imports: callr, checkmate, cli, dplyr, ggplot2, glue, httr, jsonlite,
+        kableExtra, knitr, purrr, quarto, R6, renv, reticulate, rlang,
+        rmarkdown, sessioninfo, stringr, tibble, tidyr, unglue, utils,
+        withr, yaml, zephyr (>= 0.1.1)
+Suggests: testthat (>= 3.0.0), usethis
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+SystemRequirements: Quarto command line tool
+        (<https://github.com/quarto-dev/quarto-cli>).
+NeedsCompilation: no
+Packaged: 2025-03-12 13:22:48 UTC; oath
+Author: Aksel Thomsen [aut, cre],
+  Lovemore Gakava [aut],
+  Cervan Girard [aut],
+  Kristian Troejelsgaard [aut],
+  Steffen Falgreen Larsen [aut],
+  Vladimir Obucina [aut],
+  Novo Nordisk A/S [cph]
+Maintainer: Aksel Thomsen <oath@novonordisk.com>
