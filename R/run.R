@@ -5,7 +5,8 @@
 #' Logs for each script are stored in the same folder as the script.
 #'
 #' The way the execution is logged is configurable through several options for
-#' e.g. the verbosity of the logs. See [whirl-options] on how to configure these.
+#' e.g. the verbosity of the logs.
+#' See [whirl-options] on how to configure these.
 #'
 #' @param input  A character vector of file path(s) to R, R Markdown, Quarto
 #'   scripts, or files in a folder using regular expression, or to to a whirl
@@ -62,9 +63,8 @@
 #' })
 #'
 #' @export
-
 run <- function(
-    input,
+    input = "_whirl.yml",
     steps = NULL,
     summary_file = "summary.html",
     n_workers = zephyr::get_option("n_workers", "whirl"),
@@ -73,12 +73,19 @@ run <- function(
     track_files = zephyr::get_option("track_files", "whirl"),
     out_formats = zephyr::get_option("out_formats", "whirl"),
     log_dir = zephyr::get_option("log_dir", "whirl")) {
+
   # Additional Settings
   track_files_discards <- zephyr::get_option("track_files_discards") |>
     c(.libPaths()) # Don't track the library paths
   track_files_keep <- zephyr::get_option("track_files_keep")
   approved_pkgs_folder <- zephyr::get_option("approved_pkgs_folder")
   approved_pkgs_url <- zephyr::get_option("approved_pkgs_url")
+
+  # Check suggest imports if they are needed
+  if (check_renv) rlang::check_installed("renv")
+  if (!is.null(approved_pkgs_folder) || !is.null(approved_pkgs_url)) {
+    rlang::check_installed("ggplot2")
+  }
 
   # Message when initiating
   d <- NULL

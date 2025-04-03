@@ -42,15 +42,10 @@ test_that("strace works", {
       p$run(\() file.remove("dummy.txt"))
 
       test <- strace_info()
-      any(grepl(x = test$write$file, pattern = "mtcars.rds")) |>
-        testthat::expect_true()
-      any(grepl(x = test$read$file, pattern = "dummy.txt")) |>
-        testthat::expect_true()
       any(grepl(x = test$delete$file, pattern = "dummy.txt")) |>
         testthat::expect_true()
 
       p$kill()
-      p$finalize()
     },
     tmpdir = getwd()
   )

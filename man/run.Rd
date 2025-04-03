@@ -5,7 +5,7 @@
 \title{Execute single or multiple R, R Markdown, and Quarto scripts}
 \usage{
 run(
-  input,
+  input = "_whirl.yml",
   steps = NULL,
   summary_file = "summary.html",
   n_workers = zephyr::get_option("n_workers", "whirl"),
@@ -58,7 +58,8 @@ Executes and logs the execution of the scripts.
 Logs for each script are stored in the same folder as the script.
 
 The way the execution is logged is configurable through several options for
-e.g. the verbosity of the logs. See \link{whirl-options} on how to configure these.
+e.g. the verbosity of the logs.
+See \link{whirl-options} on how to configure these.
 }
 \examples{
 \dontshow{if (!is.null(quarto::quarto_path())) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

@@ -1,8 +1,14 @@
-# whirl dev
+# whirl 0.2.0
+
+* Initial CRAN release
+* New default `input` argument of run() set to "_whirl.yml"
+* Added RStudio addins for running all and the active script
+* Minor tweaks on the run() printout
 * Fix UT for azure CI
 * Added pre-commit for developers
 * Fixed linting errors
 * Fix typo in `track_files_discards` option
+* Increases unit test coverage and skips `run()` tests etc. when Quarto is not available
 
 # whirl 0.1.7 (2024-12-17)
 * Enable redirection of logs through the `log_dir` argument in `run()`.
