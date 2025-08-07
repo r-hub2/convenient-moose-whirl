@@ -10,7 +10,6 @@ run(
   summary_file = "summary.html",
   n_workers = zephyr::get_option("n_workers", "whirl"),
   check_renv = zephyr::get_option("check_renv", "whirl"),
-  verbosity_level = zephyr::get_verbosity_level("whirl"),
   track_files = zephyr::get_option("track_files", "whirl"),
   out_formats = zephyr::get_option("out_formats", "whirl"),
   log_dir = zephyr::get_option("log_dir", "whirl")
@@ -36,9 +35,6 @@ A maximum of 128 workers is allowed.. Default: \code{1}.}
 
 \item{check_renv}{Should the projects renv status be checked?. Default: \code{FALSE}.}
 
-\item{verbosity_level}{Verbosity level for functions in whirl.
-See \link[zephyr:verbosity_level]{zephyr::verbosity_level} for details.. Default: \code{NA_character_}.}
-
 \item{track_files}{Should files read and written be tracked?
 Currently only supported on Linux.. Default: \code{FALSE}.}
 
@@ -62,44 +58,43 @@ e.g. the verbosity of the logs.
 See \link{whirl-options} on how to configure these.
 }
 \examples{
-\dontshow{if (!is.null(quarto::quarto_path())) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-
-# Start by copying the following three example scripts:
+\dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+# Copy example scripts:
 file.copy(
   from = system.file("examples", c("success.R", "warning.R", "error.R"),
     package = "whirl"
   ),
-  to = "."
+  to = tempdir()
 )
 
-# Run a single script
-run("success.R")
+# Run a single script and create log:
+run(file.path(tempdir(), "success.R"))
 
-# Run several scripts in parallel on up to 2 workers
-run(c("success.R", "warning.R", "error.R"), n_workers = 2)
-
-# Run scripts in two steps by providing them as list elements
+# Run several scripts in parallel on up to 2 workers:
 run(
-  list(
-    c("success.R", "warning.R"),
-    "error.R"
-  ),
+  input = file.path(tempdir(), c("success.R", "warning.R", "error.R")),
   n_workers = 2
 )
-\dontshow{\}) # examplesIf}
-\dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+
+# Run several scripts in two steps by providing them as list elements:
+run(
+  list(
+    file.path(tempdir(), c("success.R", "warning.R")),
+    file.path(tempdir(), "error.R")
+  )
+)
 
 # Re-directing the logs to a sub-folder by utilizing the log_dir argument in
-# run(). This will require that the sub-folder exist and the code is
-# therefore not executed
+# run(). This will require that the sub-folder exists.
 
 # Specifying the path using a manually defined character
-run("success.R", log_dir = getwd())
+run(file.path(tempdir(), "success.R"), log_dir = tempdir())
 
 # Specifying the path with a generic function that can handle the scripts
 # individually.
-run("success.R", log_dir = function(x) {
-  paste0(dirname(x), "/logs")
-})
+run(
+  input = file.path(tempdir(), "success.R"),
+  log_dir = function(x) {paste0(dirname(x), "/logs")}
+)
 \dontshow{\}) # examplesIf}
 }

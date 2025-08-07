@@ -4,7 +4,7 @@ expect_single_script <- function(res) {
 
   res[["result"]][[1]] |>
     names() |>
-    testthat::expect_equal(c("status", "session_info_rlist", "log_details"))
+    testthat::expect_equal(c("script", "status", "files", "session", "logs"))
 
   return(invisible(res))
 }
@@ -12,21 +12,29 @@ expect_single_script <- function(res) {
 test_that("Run single R script", {
   skip_if_no_quarto()
   res <- test_script("success.R") |>
-    run() |>
+    run(summary_file = NULL) |>
     expect_no_warning() |>
     expect_no_error()
 
   expect_single_script(res)
 
-  test_script("success.R") |>
-    run(verbosity_level = "verbose") |>
-    expect_message()
+  withr::with_options(
+    new = list(whirl.verbosity_level = "verbose"),
+    code = {
+      test_script("success.R") |>
+        run(summary_file = NULL) |>
+        expect_message() |>
+        suppressMessages()
+    }
+  )
 })
 
 test_that("Run single python script", {
+  skip_on_cran()
   skip_if_no_quarto()
+  skip_if_no_python()
   res <- test_script("py_success.py") |>
-    run() |>
+    run(summary_file = NULL) |>
     expect_no_warning() |>
     expect_no_error()
 
@@ -37,17 +45,17 @@ expect_multiple_scripts <- function(res) {
   res[["status"]] |>
     testthat::expect_equal(c("success", "warning", "error"))
 
-  res[["result"]][[1]][["status"]][c("error", "warning")] |>
+  res[["result"]][[1]][["status"]][c("errors", "warnings")] |>
     lapply(\(x) length(x) > 0) |>
     unlist() |>
     testthat::expect_equal(c(FALSE, FALSE), ignore_attr = TRUE)
 
-  res[["result"]][[2]][["status"]][c("error", "warning")] |>
+  res[["result"]][[2]][["status"]][c("errors", "warnings")] |>
     lapply(\(x) length(x) > 0) |>
     unlist() |>
     testthat::expect_equal(c(FALSE, TRUE), ignore_attr = TRUE)
 
-  res[["result"]][[3]][["status"]][c("error", "warning")] |>
+  res[["result"]][[3]][["status"]][c("errors", "warnings")] |>
     lapply(\(x) length(x) > 0) |>
     unlist() |>
     testthat::expect_equal(c(TRUE, FALSE), ignore_attr = TRUE)
@@ -65,7 +73,9 @@ test_that("Run multiple R scripts", {
 })
 
 test_that("Run multiple python scripts", {
+  skip_on_cran()
   skip_if_no_quarto()
+  skip_if_no_python()
   res <- test_script(c("py_success.py", "py_warning.py", "py_error.py")) |>
     run(n_workers = 2) |>
     expect_no_error()
@@ -74,20 +84,22 @@ test_that("Run multiple python scripts", {
 })
 
 test_that("Run yaml config file", {
+  skip_on_cran()
   skip_if_no_quarto()
   res <- test_script("_whirl.yaml") |>
-    run(n_workers = 2) |>
+    run(summary_file = NULL, n_workers = 2) |>
     expect_no_error()
 })
 
 test_that("Change the log_dir to a path", {
+  skip_on_cran()
   skip_if_no_quarto()
   # Custom path
   custom_path <- withr::local_tempdir()
 
   # Execute run() with log_dir = custom path
   res <- test_script("success.R") |>
-    run(log_dir = custom_path) |>
+    run(summary_file = NULL, log_dir = custom_path) |>
     expect_no_error()
 
   # Check if the log file is created in the custom path
@@ -97,6 +109,7 @@ test_that("Change the log_dir to a path", {
 })
 
 test_that("Change the log_dir with a function", {
+  skip_on_cran()
   skip_if_no_quarto()
   # Custom path and copy script
   custom_path <- withr::local_tempdir()
@@ -106,7 +119,7 @@ test_that("Change the log_dir with a function", {
 
   # Execute run() with log_dir as a function
   res <- file.path(custom_path, "warning.R") |>
-    run(log_dir = function(x) {
+    run(summary_file = NULL, log_dir = function(x) {
       paste0(dirname(x), "/logs")
     }) |>
     expect_no_error()
@@ -118,26 +131,28 @@ test_that("Change the log_dir with a function", {
 })
 
 test_that("Change the execute_dir to a path", {
+  skip_on_cran()
   skip_if_no_quarto()
   custom_path <- withr::local_tempdir()
   withr::local_options(whirl.execute_dir = custom_path)
 
   test_script("success.R") |>
-    run() |>
+    run(summary_file = NULL) |>
     expect_no_error()
 
   withr::local_options(whirl.execute_dir = "this/path/does/not/exist")
 
   test_script("success.R") |>
-    run() |>
+    run(summary_file = NULL) |>
     expect_error()
 })
 
 test_that("Change the execute_dir to a function", {
+  skip_on_cran()
   skip_if_no_quarto()
   withr::local_options(whirl.execute_dir = \(x) dirname(x))
 
   test_script("success.R") |>
-    run() |>
+    run(summary_file = NULL) |>
     expect_no_error()
 })

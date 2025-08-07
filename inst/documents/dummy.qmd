@@ -2,16 +2,13 @@
 params:
   script: 'dev'
   with_library_paths: library_paths
-  check_approved_folder_pkgs: NULL
-  check_approved_url_pkgs: NULL
   renv: TRUE
   tmpdir: "."
 ---
 
-```{r setup}
+```{r}
 #| label: Setup
 #| include: false
-
 knitr::opts_chunk$set(
   error = TRUE,
   warning = TRUE,
@@ -20,11 +17,15 @@ knitr::opts_chunk$set(
 )
 
 .libPaths(c(character(), params$with_library_paths))
+
+file.path(params$tmpdir, "parent_options.rds") |> 
+  readRDS() |> 
+  options()
 ```
 
 ```{r}
 #| label: Log R
-#| eval: !expr grepl("\\.R$", params$script)
+#| eval: !expr base::grepl("\\.R$", params$script)
 #| echo: false
 knitr::spin_child(params$script)
 ```
@@ -32,52 +33,34 @@ knitr::spin_child(params$script)
 ```{r}
 #| label: Log Quarto
 #| child: !expr params$script
-#| eval: !expr grepl("\\.qmd$", params$script)
-#| include: !expr grepl("\\.qmd$", params$script)
+#| eval: !expr base::grepl("\\.qmd$", params$script)
+#| include: !expr base::grepl("\\.qmd$", params$script)
 ```
 
 ```{r}
 #| label: Log Rmarkdown
 #| child: !expr params$script
-#| eval: !expr grepl("\\.Rmd$", params$script)
-#| include: !expr grepl("\\.Rmd$", params$script)
+#| eval: !expr base::grepl("\\.Rmd$", params$script)
+#| include: !expr base::grepl("\\.Rmd$", params$script)
 ```
 
 ```{python}
 #| label: Log Python
 #| file: !expr params$script
-#| eval: !expr grepl("\\.py$", params$script)
-#| include: !expr grepl("\\.py$", params$script)
+#| eval: !expr base::grepl("\\.py$", params$script)
+#| include: !expr base::grepl("\\.py$", params$script)
 ```
 
 ```{python}
 #| label: Python modules
 #| file: !expr file.path(params$tmpdir, "python_modules.py")
-#| eval: !expr grepl("\\.py$", params$script)
+#| eval: !expr base::grepl("\\.py$", params$script)
 #| echo: false
 ```
 
 ```{r}
-#| label: Session info
+#| label: renv status
 #| include: false
-
-python_packages <- NULL
-
-if (file.exists(file.path(params$tmpdir, "python_imports.json"))) {
-  python_packages <- whirl:::python_package_info(
-    json = file.path(params$tmpdir, "python_imports.json")
-  )
-}
-
-saveRDS(
-  object = whirl:::session_info(
-    approved_folder_pkgs = params$check_approved_folder_pkgs,
-    approved_url_pkgs = params$check_approved_url_pkgs,
-    python_packages = python_packages
-  ),
-  file = file.path(params$tmpdir, "session_info.rds")
-)
-
 if (is.character(params$renv) && params$renv == "yes" ||
       is.logical(params$renv) && params$renv) {
   saveRDS(
@@ -85,4 +68,37 @@ if (is.character(params$renv) && params$renv == "yes" ||
     file = file.path(params$tmpdir, "renv_status.rds")
   )
 }
+```
+
+```{r}
+#| label: Log options and environment
+#| include: false
+saveRDS(
+  object = options(),
+  file = file.path(params$tmpdir, "options.rds")
+)
+
+saveRDS(
+  object = Sys.getenv(),
+  file = file.path(params$tmpdir, "environment.rds")
+)
+```
+
+```{r}
+#| label: Session info
+#| include: false
+info <- list( # Due to https://github.com/r-lib/sessioninfo/issues/96
+    platform = sessioninfo::session_info(info = "platform")[["platform"]],
+    packages = sessioninfo::session_info(info = "packages")[["packages"]],
+    python = sessioninfo::session_info(info = "python")[["python"]]
+  )
+
+if (!"quarto" %in% names(info$platform)) { # Due to older versions of sessioninfo
+  info$platform$quarto <- paste(quarto::quarto_version(), "@", quarto::quarto_path())
+}
+
+saveRDS(
+  object = info,
+  file = file.path(params$tmpdir, "session_info.rds")
+)
 ```

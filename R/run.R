@@ -22,69 +22,65 @@
 #' @inheritParams whirl-options-params
 #' @return A tibble containing the execution results for all the scripts.
 #'
-#' @examplesIf !is.null(quarto::quarto_path())
-#'
-#' # Start by copying the following three example scripts:
+#' @examplesIf FALSE
+#' # Copy example scripts:
 #' file.copy(
 #'   from = system.file("examples", c("success.R", "warning.R", "error.R"),
 #'     package = "whirl"
 #'   ),
-#'   to = "."
+#'   to = tempdir()
 #' )
 #'
-#' # Run a single script
-#' run("success.R")
+#' # Run a single script and create log:
+#' run(file.path(tempdir(), "success.R"))
 #'
-#' # Run several scripts in parallel on up to 2 workers
-#' run(c("success.R", "warning.R", "error.R"), n_workers = 2)
-#'
-#' # Run scripts in two steps by providing them as list elements
+#' # Run several scripts in parallel on up to 2 workers:
 #' run(
-#'   list(
-#'     c("success.R", "warning.R"),
-#'     "error.R"
-#'   ),
+#'   input = file.path(tempdir(), c("success.R", "warning.R", "error.R")),
 #'   n_workers = 2
 #' )
 #'
-#' @examplesIf FALSE
+#' # Run several scripts in two steps by providing them as list elements:
+#' run(
+#'   list(
+#'     file.path(tempdir(), c("success.R", "warning.R")),
+#'     file.path(tempdir(), "error.R")
+#'   )
+#' )
 #'
 #' # Re-directing the logs to a sub-folder by utilizing the log_dir argument in
-#' # run(). This will require that the sub-folder exist and the code is
-#' # therefore not executed
+#' # run(). This will require that the sub-folder exists.
 #'
 #' # Specifying the path using a manually defined character
-#' run("success.R", log_dir = getwd())
+#' run(file.path(tempdir(), "success.R"), log_dir = tempdir())
 #'
 #' # Specifying the path with a generic function that can handle the scripts
 #' # individually.
-#' run("success.R", log_dir = function(x) {
-#'   paste0(dirname(x), "/logs")
-#' })
+#' run(
+#'   input = file.path(tempdir(), "success.R"),
+#'   log_dir = function(x) {paste0(dirname(x), "/logs")}
+#' )
 #'
 #' @export
 run <- function(
-    input = "_whirl.yml",
-    steps = NULL,
-    summary_file = "summary.html",
-    n_workers = zephyr::get_option("n_workers", "whirl"),
-    check_renv = zephyr::get_option("check_renv", "whirl"),
-    verbosity_level = zephyr::get_verbosity_level("whirl"),
-    track_files = zephyr::get_option("track_files", "whirl"),
-    out_formats = zephyr::get_option("out_formats", "whirl"),
-    log_dir = zephyr::get_option("log_dir", "whirl")) {
-
+  input = "_whirl.yml",
+  steps = NULL,
+  summary_file = "summary.html",
+  n_workers = zephyr::get_option("n_workers", "whirl"),
+  check_renv = zephyr::get_option("check_renv", "whirl"),
+  track_files = zephyr::get_option("track_files", "whirl"),
+  out_formats = zephyr::get_option("out_formats", "whirl"),
+  log_dir = zephyr::get_option("log_dir", "whirl")
+) {
   # Additional Settings
   track_files_discards <- zephyr::get_option("track_files_discards") |>
     c(.libPaths()) # Don't track the library paths
   track_files_keep <- zephyr::get_option("track_files_keep")
-  approved_pkgs_folder <- zephyr::get_option("approved_pkgs_folder")
-  approved_pkgs_url <- zephyr::get_option("approved_pkgs_url")
+  approved_packages <- zephyr::get_option("approved_packages")
 
   # Check suggest imports if they are needed
-  if (check_renv) rlang::check_installed("renv")
-  if (!is.null(approved_pkgs_folder) || !is.null(approved_pkgs_url)) {
-    rlang::check_installed("ggplot2")
+  if (check_renv) {
+    rlang::check_installed("renv")
   }
 
   # Message when initiating
@@ -116,20 +112,18 @@ run <- function(
   n_workers <- min(128, n_workers)
 
   zephyr::msg_verbose(
-    message = "Executing scripts in parallel using {n_workers} cores"
+    message = "Executing scripts in parallel using {n_workers} worker(s)"
   )
 
   # Initiating the queue
   queue <- whirl_queue$new(
     n_workers = n_workers,
     check_renv = check_renv,
-    verbosity_level = verbosity_level,
     track_files = track_files,
     out_formats = out_formats,
     track_files_discards = track_files_discards,
     track_files_keep = track_files_keep,
-    approved_pkgs_folder = approved_pkgs_folder,
-    approved_pkgs_url = approved_pkgs_url,
+    approved_packages = approved_packages,
     log_dir = log_dir
   )
 
@@ -146,5 +140,8 @@ run <- function(
     render_summary(input = summary_tibble, summary_file = summary_file)
   }
 
-  invisible(result$queue)
+  queue <- result$queue
+  attr(x = queue, which = "whirl_input") <- input
+
+  invisible(queue)
 }

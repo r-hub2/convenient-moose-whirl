@@ -4,11 +4,11 @@
 \name{whirl-package}
 \alias{whirl}
 \alias{whirl-package}
-\title{whirl: Execute and log execution of scripts}
+\title{whirl: Log Execution of Scripts}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Execute scripts in batch, while simultaneously creating logs for each script execution.
+Logging of scripts suitable for clinical trials using 'Quarto' to create nice human readable logs. 'whirl' enables execution of scripts in batch, while simultaneously creating logs for the execution of each script, and providing an overview summary log of the entire batch execution.
 }
 \seealso{
 Useful links:
@@ -29,6 +29,9 @@ Authors:
   \item Kristian Troejelsgaard \email{ktqn@novonordisk.com}
   \item Steffen Falgreen Larsen \email{sffl@novonordisk.com}
   \item Vladimir Obucina \email{vlob@novonordisk.com}
+  \item Michael Svingel \email{wymz@novonordisk.com}
+  \item Skander Mulder \email{sktf@novonordisk.com}
+  \item Oliver Lundsgaard \email{ovlr@novonordisk.com}
 }
 
 Other contributors:

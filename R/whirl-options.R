@@ -55,8 +55,7 @@ zephyr::create_option(
     "^/urandom",
     "^/.cache"
   ),
-  description =
-    "List of file naming patterns not be tracked when track_files = TRUE"
+  description = "List of file naming patterns not be tracked when track_files = TRUE"
 )
 
 zephyr::create_option(
@@ -67,15 +66,9 @@ zephyr::create_option(
 )
 
 zephyr::create_option(
-  name = "approved_pkgs_folder",
+  name = "approved_packages",
   default = NULL,
-  description = "Approved folder library packages"
-)
-
-zephyr::create_option(
-  name = "approved_pkgs_url",
-  default = NULL,
-  description = "Approved URL library packages"
+  description = "List of approved packages and their version in the format: \\{name\\}@\\{version\\}"
 )
 
 zephyr::create_option(
@@ -109,4 +102,17 @@ zephyr::create_option(
   default = 9000,
   description = "Timeout for waiting for the R process from callr::r_session to 
   start, in milliseconds."
+)
+
+zephyr::create_option(
+  name = "environment_secrets",
+  default = c(
+    "BASH_FUNC",
+    "_SSL_CERT",
+    "_KEY",
+    "_PAT",
+    "_TOKEN"
+  ),
+  description = "Secret environment variable patterns. 
+  Any variables matching will not be included in the logs."
 )

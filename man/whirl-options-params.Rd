@@ -20,9 +20,7 @@ Currently only supported on Linux.. Default: \code{FALSE}.}
 \item{track_files_keep}{List of file naming patterns always to be tracked when
 track_files = TRUE. Default: \code{NULL}.}
 
-\item{approved_pkgs_folder}{Approved folder library packages. Default: \code{NULL}.}
-
-\item{approved_pkgs_url}{Approved URL library packages. Default: \code{NULL}.}
+\item{approved_packages}{List of approved packages and their version in the format: \{name\}@\{version\}. Default: \code{NULL}.}
 
 \item{n_workers}{Number of simultaneous workers used in the run function.
 A maximum of 128 workers is allowed.. Default: \code{1}.}
@@ -40,6 +38,9 @@ as input and returns the execution directory.. Default: \code{NULL}.}
 
 \item{wait_timeout}{Timeout for waiting for the R process from callr::r_session to
 start, in milliseconds.. Default: \code{9000}.}
+
+\item{environment_secrets}{Secret environment variable patterns.
+Any variables matching will not be included in the logs.. Default: \code{c("BASH_FUNC", "_SSL_CERT", "_KEY", "_PAT", "_TOKEN")}.}
 }
 \description{
 Internal parameters for reuse in functions
